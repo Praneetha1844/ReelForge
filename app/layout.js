@@ -1,8 +1,13 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-
 import Provider from "./provider";
+import UserSaver from "../components/UserSaver";
+
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,16 +27,19 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Provider>
-        {children}
-        </Provider>
-       
-      </body>
-    </html>
+      <html lang="en">
+        <body
+          className={`${outfit.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
+          suppressHydrationWarning={true}
+        >
+          <Provider>
+            {children}
+          </Provider>
+          
+          {/* UserSaver component that runs on every page */}
+          <UserSaver />
+        </body>
+      </html>
     </ClerkProvider>
   );
 }

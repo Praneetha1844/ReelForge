@@ -1,4 +1,4 @@
-import { boolean } from "drizzle-orm/gel-core";
+import { boolean } from "drizzle-orm/pg-core";  // Fix: remove "gel-core"
 import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {

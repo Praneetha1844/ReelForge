@@ -1,9 +1,12 @@
 import { defineConfig } from "drizzle-kit";
+
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is not set. See .env.example.");
+}
+
 export default defineConfig({
   dialect: "postgresql",
   schema: "./configs/schema.js",
   out: "./drizzle",
-  dbCredentials: {
-   url: "postgresql://neondb_owner:npg_pBS1KN0VHZPt@ep-hidden-haze-a4bb494o-pooler.us-east-1.aws.neon.tech/shorts_generator?sslmode=require&channel_binding=require"
-  },
+  dbCredentials: { url: process.env.DATABASE_URL },
 });

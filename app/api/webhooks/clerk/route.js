@@ -1,62 +1,49 @@
-import { Webhook } from 'svix';
-import { headers } from 'next/headers';
-import { WebhookEvent } from '@clerk/nextjs/server';
-import { saveUser } from '@/app/actions/saveUser';
+import { Webhook } from "svix";
+import { headers } from "next/headers";
+import { upsertUser } from "@/lib/users";
 
 export async function POST(req) {
-  // Get the headers
-  const headerPayload = headers();
-  const svix_id = headerPayload.get("svix-id");
-  const svix_timestamp = headerPayload.get("svix-timestamp");
-  const svix_signature = headerPayload.get("svix-signature");
-
-  // If there are no headers, error out
-  if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response('Error occured -- no svix headers', {
-      status: 400
-    });
+  const secret = process.env.CLERK_WEBHOOK_SECRET;
+  if (!secret) {
+    return new Response("Webhook secret not configured", { status: 500 });
   }
 
-  // Get the body
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
+  const h = await headers();
+  const svixHeaders = {
+    "svix-id": h.get("svix-id"),
+    "svix-timestamp": h.get("svix-timestamp"),
+    "svix-signature": h.get("svix-signature"),
+  };
+  if (Object.values(svixHeaders).some((v) => !v)) {
+    return new Response("Missing svix headers", { status: 400 });
+  }
 
-  // Create a new Svix instance with your secret.
-  const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET || '');
-
+  // Verify the raw body: re-serialising parsed JSON would break the signature.
+  const body = await req.text();
   let evt;
-
-  // Verify the payload with the headers
   try {
-    evt = wh.verify(body, {
-      "svix-id": svix_id,
-      "svix-timestamp": svix_timestamp,
-      "svix-signature": svix_signature,
-    });
-  } catch (err) {
-    console.error('Error verifying webhook:', err);
-    return new Response('Error occured', {
-      status: 400
-    });
+    evt = new Webhook(secret).verify(body, svixHeaders);
+  } catch {
+    return new Response("Invalid signature", { status: 400 });
   }
 
-  // Get the ID and type
-  const { id } = evt.data;
-  const eventType = evt.type;
-
-  console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
-  console.log('Webhook body:', body);
-
-  // Handle the webhook
-  if (eventType === 'user.created') {
+  if (evt.type === "user.created") {
+    const d = evt.data;
+    const email = d.email_addresses?.find(
+      (e) => e.id === d.primary_email_address_id
+    )?.email_address;
     try {
-      await saveUser(evt.data);
-      console.log('User saved to database via webhook');
+      await upsertUser({
+        clerkId: d.id,
+        email,
+        name: [d.first_name, d.last_name].filter(Boolean).join(" "),
+        imageUrl: d.image_url,
+      });
     } catch (error) {
-      console.error('Error saving user via webhook:', error);
-      return new Response('Error saving user', { status: 500 });
+      console.error("Webhook user sync failed:", error.message);
+      return new Response("Error saving user", { status: 500 });
     }
   }
 
-  return new Response('', { status: 200 });
+  return new Response(null, { status: 200 });
 }

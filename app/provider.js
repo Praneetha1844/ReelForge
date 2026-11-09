@@ -1,15 +1,6 @@
 "use client";
-import { useUser } from '@clerk/nextjs';
-import React from 'react';
 
-function Provider({ children }) {
-  const { user } = useUser();
-
-  return (
-    <div>
-      {children}
-    </div>
-  );
+// Placeholder for client-side context providers.
+export default function Provider({ children }) {
+  return <>{children}</>;
 }
-
-export default Provider;

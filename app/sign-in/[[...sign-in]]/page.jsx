@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { SignIn } from "@clerk/nextjs";
-import UserSaver from "./UserSaver";
 
 export default function Page() {
   return (
@@ -25,9 +24,6 @@ export default function Page() {
           </div>
         </div>
       </div>
-      
-      {/* Component to handle user saving */}
-      <UserSaver />
     </div>
   );
 }

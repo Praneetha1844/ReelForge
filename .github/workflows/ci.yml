@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
     env:
       # Placeholders only: the build needs the variables to exist, not to be valid credentials.
@@ -14,10 +14,14 @@ jobs:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk
       CLERK_SECRET_KEY: sk_test_placeholder
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      # shortcut: package-lock.json predates the test and lint dev dependencies, so `npm ci`
+      # would fail. Switch back to `npm ci` after regenerating the lockfile with `npm install`.
+      - run: npm install --no-audit --no-fund
+      - run: npm run lint
+      - run: npm test
       - run: npm run build

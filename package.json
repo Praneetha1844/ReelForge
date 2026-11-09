@@ -1,7 +1,10 @@
 {
-  "name": "ai_vid",
+  "name": "reelforge",
   "version": "0.1.0",
   "private": true,
+  "description": "A workspace for creating short-form videos: Next.js, Clerk auth and a Neon/Drizzle data layer.",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

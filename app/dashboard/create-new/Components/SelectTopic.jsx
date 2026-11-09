@@ -3,9 +3,7 @@ import React from 'react'
 import {
     Select,
     SelectContent,
-    SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
@@ -16,13 +14,13 @@ function SelectTopic() {
         <h2 className="font-bold text-2xl text-purple-500">Content</h2>
         <p className="text-gray-500"> What is the topic of your video?</p>
         <Select>
-            <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Theme" />
+            <SelectTrigger className="w-[180px]" aria-label="Video topic">
+                <SelectValue placeholder="Topic" />
             </SelectTrigger>
             <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
+                <SelectItem value="motivational">Motivational</SelectItem>
+                <SelectItem value="fun-facts">Fun facts</SelectItem>
+                <SelectItem value="storytelling">Storytelling</SelectItem>
             </SelectContent>
             </Select>
     </div>

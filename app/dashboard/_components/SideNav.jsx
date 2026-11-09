@@ -35,9 +35,9 @@ function SideNav() {
   return (
     <div className='w-64 h-screen shadow-md p-5'>
         <div className='grid gap-3'>
-       {MenuOptions.map((item, index) => ( 
-           <Link href={item.path} key={index}>     
-            <div key={item.id} className={`flex items-center gap-3 p-3 hover:bg-purple-500 hover:text-white rounded-md cursor-pointer
+       {MenuOptions.map((item) => (
+           <Link href={item.path} key={item.id}>
+            <div className={`flex items-center gap-3 p-3 hover:bg-purple-500 hover:text-white rounded-md cursor-pointer
                 ${path===item.path && 'bg-purple-500 text-white'}
                 `}>
             <item.icon className="w-5 h-5" />

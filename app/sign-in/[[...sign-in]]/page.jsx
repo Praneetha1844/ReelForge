@@ -3,14 +3,14 @@ import { SignIn } from "@clerk/nextjs";
 
 export default function Page() {
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-700 via-black to-gray-700">
+    <main className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-700 via-black to-gray-700">
       <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-6xl relative z-10 gap-6 p-6">
         
         {/* Left column with image */}
         <div className="relative w-full h-[90vh] p-4">
           <Image
             src="/signin.jpeg"
-            alt="Sign in illustration"
+            alt=""
             fill
             className="object-cover rounded-lg shadow-2xl"
             priority
@@ -24,6 +24,6 @@ export default function Page() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -1,6 +1,11 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { upsertUser } from "@/lib/users";
+import { deleteUserByClerkId, upsertUser } from "@/lib/users";
+
+function primaryEmail(data) {
+  return data.email_addresses?.find((e) => e.id === data.primary_email_address_id)
+    ?.email_address;
+}
 
 export async function POST(req) {
   const secret = process.env.CLERK_WEBHOOK_SECRET;
@@ -27,22 +32,27 @@ export async function POST(req) {
     return new Response("Invalid signature", { status: 400 });
   }
 
-  if (evt.type === "user.created") {
-    const d = evt.data;
-    const email = d.email_addresses?.find(
-      (e) => e.id === d.primary_email_address_id
-    )?.email_address;
-    try {
+  const d = evt.data;
+  try {
+    if (evt.type === "user.created" || evt.type === "user.updated") {
+      const email = primaryEmail(d);
+      if (!email) {
+        // A permanent condition: answering with an error would make Clerk retry forever.
+        console.warn("Webhook skipped: user has no primary email");
+        return new Response(null, { status: 200 });
+      }
       await upsertUser({
         clerkId: d.id,
         email,
         name: [d.first_name, d.last_name].filter(Boolean).join(" "),
         imageUrl: d.image_url,
       });
-    } catch (error) {
-      console.error("Webhook user sync failed:", error.message);
-      return new Response("Error saving user", { status: 500 });
+    } else if (evt.type === "user.deleted") {
+      await deleteUserByClerkId(d.id);
     }
+  } catch (error) {
+    console.error("Webhook handling failed:", error.message);
+    return new Response("Error saving user", { status: 500 });
   }
 
   return new Response(null, { status: 200 });

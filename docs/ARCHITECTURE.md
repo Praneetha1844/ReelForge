@@ -28,7 +28,7 @@ The email column is unique, so a Clerk user whose email collides with another ro
 
 - The database URL is read from `DATABASE_URL` on the server only. It must never use a `NEXT_PUBLIC_` prefix, which would expose it to browsers.
 - The webhook rejects requests without a configured secret, valid Svix headers and a valid signature.
-- The route matcher in `middleware.js` is a JavaScript string: the dot in the static-file pattern must be written `\.`. A single backslash is dropped and the pattern then matches no real route.
+- The route matcher in `middleware.js` is a JavaScript string: the dot in the static-file pattern must be written `\\.` in source. A single backslash is dropped and the pattern then matches no real route.
 - Response headers are hardened in `next.config.mjs`. There is no Content-Security-Policy yet; see the [security policy](../SECURITY.md).
 - Secrets live in environment variables; `.env*` is git-ignored except `.env.example`.
 

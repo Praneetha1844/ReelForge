@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ReelForge
 
-## Getting Started
+> A workspace for creating short-form videos, built on Next.js, Clerk authentication and a Neon/Drizzle data layer.
 
-First, run the development server:
+**Status: early stage.** Authentication, user persistence and the dashboard shell are implemented. Video generation is **not** implemented yet (see [Limitations](#limitations) and [Roadmap](#roadmap)).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## What it does today
+
+- Sign-in and sign-up with [Clerk](https://clerk.com); `/dashboard/*` routes are protected by middleware.
+- Mirrors each signed-in user into a PostgreSQL `users` table (on first sign-in and via a Clerk `user.created` webhook).
+- Dashboard shell: header, side navigation, empty state and a "Create New" page with a topic selector (UI only).
+
+## Tech stack
+
+| Area | Choice |
+|---|---|
+| Framework | Next.js 15 (App Router), React 19 |
+| Auth | Clerk (`@clerk/nextjs`), Svix webhook verification |
+| Database | PostgreSQL on Neon, Drizzle ORM and Drizzle Kit |
+| UI | Tailwind CSS 4, Radix UI primitives, lucide-react |
+
+## Architecture
+
+```mermaid
+flowchart LR
+  U[Browser] -->|sign in| C[Clerk]
+  U -->|/dashboard| M[Next.js middleware]
+  M -->|protect| P[App Router pages]
+  U -->|UserSaver| A[Server Action syncCurrentUser]
+  A -->|currentUser| C
+  A --> D[(Neon PostgreSQL)]
+  C -->|user.created webhook| W[/api/webhooks/clerk/]
+  W -->|verify signature| W
+  W --> D
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+More detail in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Project structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/
+  actions/syncUser.js        server action: sync the signed-in user
+  api/webhooks/clerk/        Clerk webhook endpoint
+  dashboard/                 protected pages and components
+  sign-in, sign-up/          Clerk auth pages
+components/                  UserSaver and UI primitives
+configs/                     Drizzle client and schema
+lib/users.js                 idempotent user upsert
+middleware.js                route protection
+```
 
-## Learn More
+## Getting started
 
-To learn more about Next.js, take a look at the following resources:
+Requirements: Node.js 20+, a PostgreSQL database (Neon recommended) and a Clerk application.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+cp .env.example .env.local   # then fill in the values
+npm run db:push              # create the users table (DATABASE_URL must be set in your shell)
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Credentials are provided **only through environment variables**; nothing secret is committed. See [`.env.example`](.env.example).
 
-## Deploy on Vercel
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string (server-side only) |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | Clerk keys |
+| `CLERK_WEBHOOK_SECRET` | Signing secret for the `user.created` webhook |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Script | Description |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` / `npm start` | Production build and server |
+| `npm run db:push` | Push the Drizzle schema to the database |
+| `npm run db:studio` | Open Drizzle Studio |
+
+## Limitations
+
+- No video generation, topic persistence or video list yet; the topic selector and "Create New" page are UI scaffolding.
+- `/dashboard/upgrade` and `/dashboard/account` are linked in the side navigation but not built.
+- No automated tests and no lint configuration yet; CI runs a production build.
+
+## Roadmap
+
+- [ ] Script generation from a chosen topic
+- [ ] Video rendering pipeline and storage
+- [ ] Persist and list a user's videos
+- [ ] Upgrade/subscription flow (the `subscription` column exists, unused)
+- [ ] ESLint and tests
+
+## License
+
+[MIT](LICENSE) © 2026 Praneetha Potharaju

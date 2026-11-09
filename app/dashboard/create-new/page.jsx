@@ -1,15 +1,14 @@
-import React from 'react'
-import SelectTopic from './Components/SelectTopic';
+import SelectTopic from "./Components/SelectTopic";
 
-function CreateNew() {
+export const metadata = { title: "Create new | ReelForge" };
+
+export default function CreateNew() {
   return (
     <div className="md:px-20">
-        <h2 className="font-bold text-4xl text-purple-500 text-center">Create New</h2>
-        <div className="mt-10 shadow-md p-10">
-            <SelectTopic />
-        </div>
+      <h1 className="text-center text-4xl font-bold text-purple-700">Create New</h1>
+      <div className="mt-10 p-10 shadow-md">
+        <SelectTopic />
+      </div>
     </div>
-  )
+  );
 }
-
-export default CreateNew;

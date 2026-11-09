@@ -11,10 +11,10 @@ import {
 function SelectTopic() {
   return (
     <div>
-        <h2 className="font-bold text-2xl text-purple-500">Content</h2>
-        <p className="text-gray-500"> What is the topic of your video?</p>
+        <h2 className="font-bold text-2xl text-purple-700">Content</h2>
+        <p id="topic-help" className="text-gray-600">What is the topic of your video?</p>
         <Select>
-            <SelectTrigger className="w-[180px]" aria-label="Video topic">
+            <SelectTrigger className="w-[180px]" aria-label="Video topic" aria-describedby="topic-help">
                 <SelectValue placeholder="Topic" />
             </SelectTrigger>
             <SelectContent>

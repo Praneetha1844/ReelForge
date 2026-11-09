@@ -1,26 +1,20 @@
-"use client";
-import { useState } from "react";
-import EmptyState from "./_components/EmptyState";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-function Dashboard() {
-  const [videoList, setVideoList] = useState([]);
-  
+import EmptyState from "./_components/EmptyState";
+
+export const metadata = { title: "Dashboard | ReelForge" };
+
+// Saved videos are not implemented yet, so the list is always empty.
+export default function Dashboard() {
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="font-bold text-2xl text-purple-500">Dashboard</h2>
-        <Link href="/dashboard/create-new">
-        <Button className='mt-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors'>
-             + Create New
+    <>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-purple-700">Dashboard</h1>
+        <Button asChild className="bg-blue-600 text-white hover:bg-blue-700">
+          <Link href="/dashboard/create-new">+ Create New</Link>
         </Button>
-        </Link>
       </div>
-      
-      {/* Video List Section */}
-      {videoList?.length === 0 && <EmptyState />}
-    </div>
+      <EmptyState />
+    </>
   );
 }
-
-export default Dashboard;

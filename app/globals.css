@@ -1,8 +1,9 @@
-/* Tailwind v4 setup */
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
+/* Tailwind v4: one import brings preflight and utilities. */
 @import "tailwindcss";
-/* Optional: custom global styles */
+/* Tailwind v4 does not discover tailwind.config.js on its own; without this the
+   theme colours used by the UI primitives (bg-primary, ring-ring, ...) do not exist. */
+@config "../tailwind.config.js";
+
 html, body {
   height: 100%;
   background-color: hsl(var(--background));
